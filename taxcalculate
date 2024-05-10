@@ -1,0 +1,88 @@
+class Employee:
+    def __init__(self, name, salary, pf_contribution, gis_contribution, school_children_expense, contract_employee, organization_type):
+        self.name = name
+        self.salary = salary
+        self.pf_contribution = pf_contribution
+        self.gis_contribution = gis_contribution
+        self.school_children_expense = school_children_expense
+        self.contract_employee = contract_employee
+        self.organization_type = organization_type
+
+
+class IncomeCalculator:
+    def __init__(self, employee):
+        self.employee = employee
+
+    def calculate_taxable_income(self):
+        taxable_income = self.employee.salary - self.employee.pf_contribution - self.employee.gis_contribution - self.employee.school_children_expense
+        if taxable_income < 0:
+            raise ValueError("Taxable income cannot be negative.") # uses the exception handling "ValueError" to check if the taxable income is negative.
+        return taxable_income
+
+    def calculate_tax(self):
+        taxable_income = self.calculate_taxable_income()
+        if taxable_income <= 0:
+            return 0
+        if 0 < taxable_income <= 300000:
+            tax = 0
+        elif 300001 <= taxable_income <= 400000:
+            tax = (taxable_income - 300000) * 0.10
+        elif 400001 <= taxable_income <= 650000:
+            tax = 10000 + (taxable_income - 400000) * 0.15
+        elif 650001 <= taxable_income <= 1000000:
+            tax = 32500 + (taxable_income - 650000) * 0.20
+        elif 1000001 <= taxable_income <= 1500000:
+            tax = 82500 + (taxable_income - 1000000) * 0.25
+        else:
+            tax = 182500 + (taxable_income - 1500000) * 0.30
+
+        if taxable_income >= 1000000:
+            tax += tax * 0.10  # Surcharge is used to calculate taxable income if it is greater than 1,000,000.
+
+        return tax
+
+    def display_tax_details(self):
+        print(f"Name: {self.employee.name}")
+        print(f"Organization Type: {self.employee.organization_type}")
+        taxable_income = self.calculate_taxable_income()
+        print(f"Taxable Income: {taxable_income}")
+        if taxable_income <= 0:
+            print("PIT: 0")
+        elif self.employee.contract_employee:
+            print(f"{self.employee.name}, as a contract employee, is not subject to PIT.")  
+            # this line of code prints a message showing whether the employee is a contract or not subject to PIT as they are not subject to PIT if certain conditions is meet.
+        else:
+            print(f"PIT: {self.calculate_tax()}")  # This line of code is used to calculate the tax amount based on employees taxable income.
+
+
+# User Input to create Employee instance
+name = input("Enter employee name: ")
+salary = float(input("Enter your annual salary: "))         # please enter your annual salary(eg: 24,000 * 12 = 288,000)
+pf_contribution = float(input("Enter PF contribution: "))
+gis_contribution = float(input("Enter GIS contribution: "))
+school_children_expense = float(input("Enter school children expense: "))  # children_expenses should always be 350,000.
+contract_employee = input("Is the employee a contract employee? (yes/no): ").lower() == "yes"
+organization_type = input("Enter organization type(government/corporate/private): ")
+
+# Create Employee instance
+employee = Employee(name, salary, pf_contribution, gis_contribution, school_children_expense, contract_employee, organization_type)
+
+# Create IncomeCalculator instance
+income_calculator = IncomeCalculator(employee)
+
+# Display tax details
+income_calculator.display_tax_details()
+
+
+# For example
+#Enter employee name: jimmy
+#Enter your annual salary: 420000
+#Enter GIS contribution: 21000
+#Enter school children expense: 350000
+#Is the employee a contract employee? (yes/no): n
+#Enter organization type(government/corporate/private): government
+#output
+#Name: jimmy
+#Organization Type: governmnet
+#Taxable Income: 49000.0   
+#PIT: 0       
